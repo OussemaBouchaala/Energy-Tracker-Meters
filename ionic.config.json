@@ -1,0 +1,7 @@
+{
+  "name": "energy-tracker",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue"
+}

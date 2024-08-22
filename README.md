@@ -1,0 +1,22 @@
+ToDo list:
+- meters:
+    - delete meter --------------------------- 100% Done
+- configure Usage:
+    - every meter has own readings list ------ 100% Done
+    - add new readings:
+        - reading add ------------------------ 100% Done
+        - contrainte de date ----------------- 0%
+        - value constraint ------------------- 0%
+        - edit comment ----------------------- 100% Done
+        - delete reading --------------------- 100% Done
+        - moyenne ---------------------------- 30%
+    - add charts:
+        - charts component ------------------- 100% Done
+        - build charts ----------------------- 0%
+- settings:
+    - toggle language:
+        - register language property in db --- 0%
+        - change locale ---------------------- 0%
+    - theme ---------------------------------- 0%
+    - notifications -------------------------- 0%# energy-tracker-master
+# energy-tracker-master

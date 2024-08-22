@@ -1,0 +1,10 @@
+{
+  "page-title": "Mètre",
+  "label-name": "Titre",
+  "label-unit": "Unité",
+  "label-description": "Description",
+  "label-start-value": "Valeur initiale",
+  "button-save": "Enregistrer",
+  "msg-title-required": "Titre obligatoire",
+  "msg-unit-required": "Unité obliagoire"
+}

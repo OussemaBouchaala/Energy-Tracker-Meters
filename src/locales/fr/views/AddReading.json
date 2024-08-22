@@ -1,0 +1,10 @@
+{
+    "page-title": "Nouvelle lecture",
+    "label-value": "Valeur",
+    "label-date": "Date",
+    "label-comment": "Commentaire",
+    "label-average": "Moyenne",
+    "button-save": "Enregistrer",
+    "msg-value-required": "Valeur obligatoire",
+    "msg-date-required": "Date obligatoire"
+}
