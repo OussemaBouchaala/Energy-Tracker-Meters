@@ -63,6 +63,7 @@ export default ({ dbName = "db", component = "???" } = {}) => {
 
       ready.value = true;
       log.log(LOG, "connection initialized", { dbName, component });
+
       return capSQLiteConnection;
     } catch (err) {
       log.err("[SQLite] init", dbName, err);
@@ -159,6 +160,17 @@ export default ({ dbName = "db", component = "???" } = {}) => {
 
       await capSQLiteConnection.open();
       log.log("[SQLite] opened", dbName);
+
+      try
+      {
+        var z = await capSQLiteConnection.query("SELECT * FROM options");
+        log.log("zzzzzzzzzzzz", z);
+      }
+      catch(err)
+      {
+        log.error("Error executing SELECT * FROM meters", err);
+      }
+
     } catch (err) {
       log.error("[SQLite] open", dbName, err);
       throw err;

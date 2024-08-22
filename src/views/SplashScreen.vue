@@ -7,6 +7,7 @@ import { init } from "../db/utils";
 import db from "../db";
 import { useI18n } from "vue-i18n";
 
+
 const name = "splash-screen";
 const LOG = `[component|${name}]`;
 
@@ -27,8 +28,10 @@ export default {
     const running = ref(true);
     const message = ref("");
 
+
     onMounted(async () => {
       message.value = t("SplashScreen.message-init-db");
+
       await init({ db });
       await pause(2000);
       running.value = false;

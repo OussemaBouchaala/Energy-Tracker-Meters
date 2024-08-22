@@ -29,13 +29,13 @@ CREATE TABLE IF NOT EXISTS readings(
   value REAL,
   date DATE,
   comment TEXT,
-  last_modified	INTEGER DEFAULT (strftime('%s', 'now')),
-  FOREIGN KEY (meter_id) REFERENCES meters(id) ON DELETE CASCADE
+  last_modified	INTEGER DEFAULT (strftime('%s', 'now'))
 );
 
 INSERT INTO options (name, value) VALUES ('locale', 'en');
+`
 
-`;
+//`;
 //  
 
 const upgrades = [

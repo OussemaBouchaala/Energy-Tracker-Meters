@@ -46,6 +46,7 @@ const init = async ({ db } = {}) => {
     log.debug(LOG, "db created", { name, changes });
   }
 
+
   // check db version
   const { version: dbver } = await con.getVersion();
   log.debug(LOG, "check db version", {

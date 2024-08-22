@@ -8,10 +8,6 @@ import { IonicVue } from "@ionic/vue";
 import log from "loglevel";
 
 // import the db
-import useSQLite from "./composables/useSQLite";
-import repo from "./db/repo/options";
-import { Retrier } from "@jsier/retrier";
-
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/vue/css/core.css";
 
@@ -34,6 +30,7 @@ import "./theme/variables.css";
 // i18n
 import { createI18n } from "vue-i18n";
 import messages from "./locales";
+//import useSQLite from "./composables/useSQLite";
 
 const LOG = "[main]";
 log.disableAll();
@@ -49,59 +46,66 @@ log.debug(LOG, {
 log.debug(LOG, "creating app...");
 const app = createApp(App).use(IonicVue).use(router);
 
+
 // load locale
 
-const { ready, querySingle } = useSQLite();
+ //const { ready, querySingle } = useSQLite();
+ //log.log("test", ready, querySingle);
 
-const retrierOptions = {
-  limit: 5,
-  firstAttemptDelay: 0,
-  delay: 250,
-  keepRetryingIf: (response, attempt) => {
-    log.debug(LOG, "keepRetryingIf", {
-      response,
-      attempt,
-    });
-    return !ready.value;
-  },
-};
-const retrier = new Retrier(retrierOptions);
 
-let items = []
+// const retrierOptions = {
+//   limit: 5,
+//   firstAttemptDelay: 0,
+//   delay: 250,
+//   keepRetryingIf: (response, attempt) => {
+//     log.debug(LOG, "keepRetryingIf", {
+//       response,
+//       attempt,
+//     });
+//     return !ready.value;
+//   },
+// };
+// const retrier = new Retrier(retrierOptions);
+
+// let items = []
  
-const loadData = async (attempt) => {
-  log.debug(LOG, "load locale", { attempt });
-  if (ready.value) {
-    if (!ready.value) throw new Error("fail to load locale");
+// const loadData = async (attempt) => {
+//   log.debug(LOG, "load locale", { attempt });
+//   if (ready.value) {
+//     if (!ready.value) throw new Error("fail to load locale");
 
-    try {
-      const data = await querySingle(repo.getByName({name: 'locale'}));
-      log.debug(LOG, "locale loaded", { data });
-      items = data;
-    } catch (err) {
-      log.error(err.message);
-      throw err;
-    }
-  }
-};
+//     try {
+//       const data = await querySingle(repo.getByName({name: 'locale'}));
+//       log.debug(LOG, "locale loaded", { data });
+//       items = data;
+//     } catch (err) {
+//       log.error(err.message);
+//       throw err;
+//     }
+//   }
+// };
+
+const i18n = createI18n({
+  legacy: false,
+  locale: "en",
+  messages,
+  fallbackLocale: "en",
+});
+
+  //log.debug(LOG, "db ready");
 router.isReady().then(async () => {
   log.debug(LOG, "router ready");
-  retrier.resolve((attempt) => loadData(attempt))
-  if(!items.length) {
-    log.debug(LOG, "no locale found, setting to default");
-    items = [{name: 'locale', value: 'en'}];
-  }
   app
     .use(
-      createI18n({
-        legacy: false,
-        locale: items[0].value,
-        messages,
-      })
+      createI18n(i18n)
     )
     .use(createPinia())
     .mount("#app");
+
+    //var z = useSQLite()
+    //log.log("tttttttttttttttttttttt", z)
 });
+
 
 // import { useAppStore } from "./stores/app";
 // import { storeToRefs } from "pinia";
