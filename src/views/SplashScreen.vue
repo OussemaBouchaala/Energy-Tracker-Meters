@@ -3,8 +3,8 @@ import log from "loglevel";
 import { ref, onMounted } from "vue";
 import { IonPage, IonRow, IonCol, IonSpinner, IonGrid } from "@ionic/vue";
 import { pause } from "../utils/helper";
-import { init } from "../db/utils";
-import db from "../db";
+// import { init } from "../db/utils";
+// import db from "../db";
 import { useI18n } from "vue-i18n";
 
 
@@ -32,7 +32,7 @@ export default {
     onMounted(async () => {
       message.value = t("SplashScreen.message-init-db");
 
-      await init({ db });
+      // await init({ db });
       await pause(2000);
       running.value = false;
       await pause(1000);

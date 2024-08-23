@@ -168,7 +168,7 @@ export default ({ dbName = "db", component = "???" } = {}) => {
       }
       catch(err)
       {
-        log.error("Error executing SELECT * FROM meters", err);
+        log.error("Error executing SELECT * FROM options", err);
       }
 
     } catch (err) {

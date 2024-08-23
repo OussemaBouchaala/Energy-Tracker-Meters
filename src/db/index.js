@@ -1,5 +1,5 @@
 const schema = `
-PRAGMA foreign_keys = ON;
+--PRAGMA foreign_keys = ON;
 
 CREATE TABLE IF NOT EXISTS options(
   id INTEGER PRIMARY KEY,
@@ -29,6 +29,9 @@ CREATE TABLE IF NOT EXISTS readings(
   value REAL,
   date DATE,
   comment TEXT,
+  --meter_id INTEGER,
+  --average REAL,
+  --FOREIGN KEY (meter_id) REFERENCES meters(id),
   last_modified	INTEGER DEFAULT (strftime('%s', 'now'))
 );
 

@@ -8,6 +8,7 @@ import { useAppStore } from "./stores/app";
 import { IonApp, IonRouterOutlet, IonSplitPane, IonLoading } from "@ionic/vue";
 import Menu from "./components/Menu.vue";
 import SplashScreen from "./views/SplashScreen.vue";
+import LogoScreen from "./views/LogoScreen.vue";
 
 const name = "App";
 const LOG = `[component|${name}]`;
@@ -21,6 +22,7 @@ export default {
     IonLoading,
     Menu,
     SplashScreen,
+    LogoScreen,
   },
   setup() {
     log.debug(LOG, "setup");
@@ -29,6 +31,11 @@ export default {
     const { loading } = storeToRefs(useAppStore());
 
     const showSplashScreen = ref(true);
+    const showLogoScreen = ref(true);
+
+    const onLogoScreenFadeout = () => {
+      showLogoScreen.value = false;
+    };
 
     const onSplashScreenFadeout = () => {
       showSplashScreen.value = false;
@@ -36,8 +43,10 @@ export default {
 
     return {
       showSplashScreen,
+      showLogoScreen,
       loading,
       onSplashScreenFadeout,
+      onLogoScreenFadeout,
       t,
     };
   },
@@ -46,8 +55,9 @@ export default {
 
 <template>
   <ion-app>
-    <SplashScreen v-if="showSplashScreen" @fadeout="onSplashScreenFadeout" />
-    <ion-split-pane v-else content-id="main-content">
+    <LogoScreen v-if="showLogoScreen" @fadeout="onLogoScreenFadeout"/>
+    <SplashScreen v-if="showSplashScreen && !showLogoScreen" @fadeout="onSplashScreenFadeout" />
+    <ion-split-pane v-else-if="!showSplashScreen && !showLogoScreen" content-id="main-content">
       <Menu />
       <ion-loading :is-open="loading" :message="t('App.message-loading')" />
       <ion-router-outlet id="main-content" />

@@ -85,19 +85,18 @@ const app = createApp(App).use(IonicVue).use(router);
 //   }
 // };
 
-const i18n = createI18n({
-  legacy: false,
-  locale: "en",
-  messages,
-  fallbackLocale: "en",
-});
+
 
   //log.debug(LOG, "db ready");
 router.isReady().then(async () => {
   log.debug(LOG, "router ready");
   app
     .use(
-      createI18n(i18n)
+      createI18n({
+        legacy: false,
+        locale: "en",
+        messages,
+      })
     )
     .use(createPinia())
     .mount("#app");

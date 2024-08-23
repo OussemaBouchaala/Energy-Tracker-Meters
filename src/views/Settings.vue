@@ -53,7 +53,6 @@ import {
 } from '@ionic/vue';
 
 import { ref } from 'vue';
-import { useI18n } from 'vue-i18n';
 import { useAppStore } from '../stores/app';
 import useSQLite from '../composables/useSQLite';
 import  repo from '../db/repo/options';
@@ -95,28 +94,26 @@ export default {
         // end injected code
         const darkModeEnabled = ref(true);
         const notificationsEnabled = ref(true);
-        useI18n();
         const selectedLanguage = ref('en');
 
         const setLocale = async (event) => {
             log.debug(LOG,'event', event);
             try {
-                showLoading();
+                await showLoading();
                 await run(
                     update({
-                        value: event.detail,
+                        name,
+                        value: event.detail.value,
                     })
                 );
                 shouldReloadData.value = true;
-                location.reload();
             } catch (ex) {
                 log.error(ex);
             } finally {
-                hideLoading();
-            
+                await hideLoading();
+                location.reload();
             }
         }
-        // Reload the app
         
 
         return {
