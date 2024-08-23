@@ -141,15 +141,14 @@ export default {
 
 <style scoped>
 .logo-container {
-  height: 50vh;
-  width: 50vw;
+  height: 100vh;
 }
 .flex-col {
   display: flex;
   justify-content: center;
 }
 .loader {
-  background-color: #8dd7fa;
+  background: linear-gradient( #7290B2 39%, #7598C1 41%);
   color: white;
   display: block;
   font-size: 16px;
@@ -163,7 +162,6 @@ export default {
   top: 0;
 }
 .logo-image {
-    --width: 200px;
-    --height: 200px;
+  width: 10vh;
 }
 </style>
