@@ -146,6 +146,9 @@ export default {
             log.debug(LOG, "new reading");
             const modal = await modalController.create({
                 component: NewReading,
+                componentProps: {
+                    currMeterId: props.id,
+                },
                 cssClass: 'add-reading-class',
                 swipeToClose: true,
                 presentingElement: document.querySelector('ion-content'),
@@ -208,7 +211,7 @@ export default {
 
             try {
                 nameData = await querySingle(getById({ id: parseInt(props.id) }));
-                data = await query(repo.getAll());
+                data = await query(repo.getAll({ meter_id: parseInt(props.id) }));
                 log.debug(LOG, "Loaded readings data",  data );
                 items.value = data;
                 name.value = nameData;
@@ -248,11 +251,11 @@ export default {
         };
         
 
-        const deleteItem = async (meterId) => {
+        const deleteItem = async (readingId) => {
             try {
                 // Await the result of deleteById to ensure the operation completes
                 const result = await run (
-                    repo.deleteById({ id: meterId })
+                    repo.deleteById({ id: readingId })
                 )
                 // Log the result of the deletion
                 log.debug(LOG, "delete result reading", { result });

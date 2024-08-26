@@ -75,14 +75,13 @@ export default({
     IonLabel, 
     IonInput,
   },
-  // props:{
-  //   isVisibleForm : 
-  //   {
-  //     type: Boolean,
-  //     required: true      
-  //   }
-  // },
-  setup() {
+  props:{
+    currMeterId: {
+      type: String,
+      required: true
+    }
+  },
+  setup(props) {
     log.debug(LOG, "setup");
 
     const router = useRouter();
@@ -147,10 +146,11 @@ export default({
             value: value.value,
             date: date.value,
             comment: comment.value,
+            meter_id: props.currMeterId,
           })
         );
         shouldReloadData.value = true;
-        router.push('/meters-readings');
+        router.push(`/usage/${props.currMeterId}`);
         closeModal();
       } catch (ex) {
         log.error(ex);

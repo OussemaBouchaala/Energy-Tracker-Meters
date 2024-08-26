@@ -94,7 +94,7 @@ router.isReady().then(async () => {
     .use(
       createI18n({
         legacy: false,
-        locale: "fr",
+        locale: "en",
         messages,
       })
     )

@@ -5,6 +5,7 @@ ToDo list:
     - every meter has own readings list ------ 100% Done
     - add new readings:
         - reading add ------------------------ 100% Done
+        - readings unique to a meter --------- 0%
         - contrainte de date ----------------- 0%
         - value constraint ------------------- 0%
         - edit comment ----------------------- 100% Done
@@ -15,8 +16,8 @@ ToDo list:
         - build charts ----------------------- 0%
 - settings:
     - toggle language:
-        - register language property in db --- 0%
-        - change locale ---------------------- 0%
+        - register language property in db --- 100% Done
+        - change locale ---------------------- 100% Done
     - theme ---------------------------------- 0%
-    - notifications -------------------------- 0%# energy-tracker-master
+    - notifications -------------------------- 0%
 # energy-tracker-master

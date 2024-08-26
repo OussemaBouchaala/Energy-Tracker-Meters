@@ -164,7 +164,7 @@ export default ({ dbName = "db", component = "???" } = {}) => {
       try
       {
         var z = await capSQLiteConnection.query("SELECT * FROM options");
-        log.log("zzzzzzzzzzzz", z);
+        log.log("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz", z);
       }
       catch(err)
       {
