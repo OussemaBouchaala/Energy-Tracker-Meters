@@ -9,6 +9,7 @@ import { IonApp, IonRouterOutlet, IonSplitPane, IonLoading } from "@ionic/vue";
 import Menu from "./components/Menu.vue";
 import SplashScreen from "./views/SplashScreen.vue";
 import LogoScreen from "./views/LogoScreen.vue";
+import InitBase from "./views/InitBase.vue";
 
 const name = "App";
 const LOG = `[component|${name}]`;
@@ -23,6 +24,7 @@ export default {
     Menu,
     SplashScreen,
     LogoScreen,
+    InitBase,
   },
   setup() {
     log.debug(LOG, "setup");
@@ -32,6 +34,11 @@ export default {
 
     const showSplashScreen = ref(true);
     const showLogoScreen = ref(true);
+    const showInitBase = ref(true);
+
+    const onInitBaseFadeout = () => {
+      showInitBase.value = false;
+    };
 
     const onLogoScreenFadeout = () => {
       showLogoScreen.value = false;
@@ -44,9 +51,11 @@ export default {
     return {
       showSplashScreen,
       showLogoScreen,
+      showInitBase,
       loading,
       onSplashScreenFadeout,
       onLogoScreenFadeout,
+      onInitBaseFadeout,
       t,
     };
   },
@@ -55,9 +64,12 @@ export default {
 
 <template>
   <ion-app>
-    <LogoScreen v-if="showLogoScreen" @fadeout="onLogoScreenFadeout"/>
+    <InitBase v-if="showInitBase" @fadeout="onInitBaseFadeout"/>
+    <LogoScreen v-if="showLogoScreen && !showInitBase" @fadeout="onLogoScreenFadeout"/>
     <SplashScreen v-if="showSplashScreen && !showLogoScreen" @fadeout="onSplashScreenFadeout" />
+    <!-- <SplashScreen v-if="showSplashScreen" @fadeout="onSplashScreenFadeout"/> -->
     <ion-split-pane v-else-if="!showSplashScreen && !showLogoScreen" content-id="main-content">
+    <!-- <ion-split-pane v-else-if="!showSplashScreen" content-id="main-content"> -->
       <Menu />
       <ion-loading :is-open="loading" :message="t('App.message-loading')" />
       <ion-router-outlet id="main-content" />

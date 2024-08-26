@@ -94,15 +94,12 @@ router.isReady().then(async () => {
     .use(
       createI18n({
         legacy: false,
-        locale: "en",
+        locale: "fr",
         messages,
       })
     )
     .use(createPinia())
     .mount("#app");
-
-    //var z = useSQLite()
-    //log.log("tttttttttttttttttttttt", z)
 });
 
 

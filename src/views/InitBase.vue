@@ -31,20 +31,14 @@ import {
     IonGrid, 
     IonImg ,
     //onIonViewDidEnter, 
-    onIonViewWillEnter,
+    //onIonViewWillEnter,
 } from "@ionic/vue";
-// import { pause } from "../utils/helper";
-// import { init } from "../db/utils";
-// import db from "../db";
-import { useI18n } from "vue-i18n";
-import useSQLite from '../composables/useSQLite';
-import repo from "../db/repo/options";
-import { Retrier } from "@jsier/retrier";
-import { storeToRefs } from "pinia";
-import { useAppStore } from "../stores/app";
+import { pause } from "../utils/helper";
+import { init } from "../db/utils";
+import db from "../db";
 
 
-const name = "logo-screen";
+const name = "init-base";
 const LOG = `[component|${name}]`;
 
 export default {
@@ -61,77 +55,16 @@ export default {
   setup(_, context) {
     log.debug(LOG, "setup");
 
-    const { locale } = useI18n();
-    const { ready, querySingle } = useSQLite();
-    const store = useAppStore();
-    const { shouldReloadData } = storeToRefs(store);
-    const { showLoading, hideLoading } = store;
-
     onMounted(async () => {
       log.debug(LOG, "view mounted");
-      // await init({ db });
-      // await pause(3000);
+      await init({ db });
+      await pause(3000);
       context.emit("fadeout");
-      tryLoadLocale();
     });
     
-    onIonViewWillEnter(async () => {
-      if (!shouldReloadData.value) return;
-      log.debug(LOG, "view will enter");
-      await showLoading();
-    });
 
-    // onIonViewDidEnter(async () => {
-    //   if (!shouldReloadData.value) return;
-    //   log.debug(LOG, "view did enter");
-    //   
-    // });
-    
-    const retrierOptions = {
-        limit: 5,
-        firstAttemptDelay: 0,
-        delay: 250,
-        keepRetryingIf: (response, attempt) => {
-            log.debug(LOG, "keepRetryingIf", {
-            response,
-            attempt,
-            });
-            return !ready.value;
-        },
+    return {
     };
-    const retrier = new Retrier(retrierOptions);
-
-    const tryLoadLocale = () => {
-      shouldReloadData.value = false;
-      retrier
-        .resolve((attempt) => loadLocale(attempt))
-        .then(
-          async () => {
-            log.debug(LOG, "locale loaded");
-            await hideLoading();
-          },
-          async () => {
-            log.debug(LOG, "load locale failed");
-            await hideLoading();
-          }
-        );
-    };
-
-    const loadLocale = async (attempt) => {
-        log.debug(LOG, "load locale", { attempt });
-        if (!ready.value) throw new Error("fail to load locale");
-
-        try {
-          const newLocale = await querySingle(repo.getByName({name: 'locale'}));
-          log.debug(LOG, "locale loaded", { newLocale });
-          locale.value = newLocale.value;
-          log.debug(LOG, "locale set", { locale: locale.value });
-        } catch (err) {
-            log.error(err.message);
-        throw err;
-        }
-    };
-
   },
 };
 </script>

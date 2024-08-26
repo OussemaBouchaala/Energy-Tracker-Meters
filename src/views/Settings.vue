@@ -56,7 +56,8 @@ import { ref } from 'vue';
 import { useAppStore } from '../stores/app';
 import useSQLite from '../composables/useSQLite';
 import  repo from '../db/repo/options';
-import { storeToRefs } from 'pinia';
+import { useI18n } from 'vue-i18n';
+//import { storeToRefs } from 'pinia';
 
 const { update } = repo
 const name = 'Settings';
@@ -83,9 +84,10 @@ export default {
         // injected code
         log.debug(LOG, "setup");
 
+        const { locale } = useI18n();
         const store = useAppStore();
         const { run } = useSQLite();
-        const { shouldReloadData } = storeToRefs(store);
+        //const { shouldReloadData } = storeToRefs(store);
 
 
         const { showLoading, hideLoading } = store;
@@ -94,19 +96,21 @@ export default {
         // end injected code
         const darkModeEnabled = ref(true);
         const notificationsEnabled = ref(true);
-        const selectedLanguage = ref('en');
+        const selectedLanguage = ref(locale.value);
 
         const setLocale = async (event) => {
-            log.debug(LOG,'event', event);
+            log.debug(LOG,'event', {event, currentLocale: locale.value,selectedLanguage: selectedLanguage.value});
             try {
                 await showLoading();
                 await run(
                     update({
-                        name,
+                        name: 'locale',
                         value: event.detail.value,
+                        id: 1,
                     })
                 );
-                shouldReloadData.value = true;
+                log.debug(LOG, 'locale updated');
+                //shouldReloadData.value = true;
             } catch (ex) {
                 log.error(ex);
             } finally {

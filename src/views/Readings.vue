@@ -349,7 +349,6 @@ export default {
                 <ion-fab-button
                     :disabled="!ready"
                     color="primary"
-                    v-if="!isVisibleForm"
                     >
                     <ion-icon :icon="menuIcon" />
                 </ion-fab-button>

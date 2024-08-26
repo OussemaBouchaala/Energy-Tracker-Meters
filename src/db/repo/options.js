@@ -22,9 +22,9 @@ VALUES (?, ?);
 
 const statement_update = `
 UPDATE options SET
-name = ? ,
+name = ?,
 value =?
-WHERE id = ?
+WHERE id=?
 `;
 
 export default {
