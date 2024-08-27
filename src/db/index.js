@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS readings(
   date DATE,
   comment TEXT,
   meter_id INTEGER,
-  --average REAL,
+  average REAL,
   last_modified	INTEGER DEFAULT (strftime('%s', 'now')),
   FOREIGN KEY (meter_id) REFERENCES meters(id) 
   ON DELETE CASCADE

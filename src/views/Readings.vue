@@ -97,7 +97,7 @@ export default {
         const { ready, query, querySingle, run } = useSQLite();
         
         const loading = ref(false);
-        const items = ref([]);
+        const readings = ref([]);
         const name = ref("");
         const currentId = ref("");
         //const isVisibleForm = ref(false)
@@ -148,6 +148,7 @@ export default {
                 component: NewReading,
                 componentProps: {
                     currMeterId: props.id,
+                    previousReading: readings.value[0],
                 },
                 cssClass: 'add-reading-class',
                 swipeToClose: true,
@@ -212,11 +213,12 @@ export default {
             try {
                 nameData = await querySingle(getById({ id: parseInt(props.id) }));
                 data = await query(repo.getAll({ meter_id: parseInt(props.id) }));
+                data = data.reverse();
                 log.debug(LOG, "Loaded readings data",  data );
-                items.value = data;
+                readings.value = data;
                 name.value = nameData;
                 log.debug(LOG, "Loaded name", { name: name.value });
-                log.debug(LOG, "Loaded items", { items: items.value });
+                log.debug(LOG, "Loaded readings", { readings: readings.value });
             } catch (err) {
                 log.error(LOG, "Error loading data", err);
                 throw err;
@@ -290,7 +292,7 @@ export default {
             confirmDelete,
             currentId,
             toAddChart,
-            items,
+            readings,
             ready,
             loading,
             refresh,
@@ -319,7 +321,7 @@ export default {
                 <ion-item-sliding
                     style="display:block"
                     button
-                    v-for="item in items"
+                    v-for="item in readings"
                     :key="item.id"
                 >
                     <ion-list>
@@ -330,7 +332,7 @@ export default {
                             </ion-label>
                             <ion-label slot="end" position="fixed">
                                 <span v-t="'AddReading.label-average'"></span>
-                                <span>:<br>{{ average }}</span>
+                                <span>:<br>{{ item.average }}{{ name.unit }}/jr</span>
                             </ion-label>
                             <ion-label slot="end" position="fixed">
                                 <span v-t="'AddReading.label-value'"></span>

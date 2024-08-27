@@ -262,7 +262,7 @@ export default {
 <style>
 .confirm-dialog-class {
   --width: 80%;
-  --height: 18%;
+  --height: 25%;
   --border-radius: 10px;
 }
 </style>

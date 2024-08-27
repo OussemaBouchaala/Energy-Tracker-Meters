@@ -61,6 +61,16 @@ const name="NewReading";
 const { withMessage } = helpers;
 const LOG = `[component|${name}]`;
 
+// a and b are javascript Date objects
+function dateDiffInDays(a, b) {
+  const _MS_PER_DAY = 1000 * 60 * 60 * 24;
+  // Discard the time and time-zone information.
+  const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+  const utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+
+  return Math.floor((utc2 - utc1) / _MS_PER_DAY);
+}
+
 
 export default({
   name,
@@ -79,6 +89,10 @@ export default({
     currMeterId: {
       type: String,
       required: true
+    },
+    previousReading: {
+      type: Object,
+      required: true
     }
   },
   setup(props) {
@@ -95,6 +109,7 @@ export default({
     const value = ref('');
     const date = ref('');
     const comment = ref('');
+    const average = ref(0.0);
     const submitted = ref(false);
     const now = ref(new Date());
     const nowDate = now.value.toISOString().split('T')[0];
@@ -108,7 +123,7 @@ export default({
     //   isModalOpen.value = false;
     //   context.emit('update:isVisibleForm' , false);
     // };
-
+    
     const closeModal = () => {
       modalController.dismiss();
     };
@@ -138,7 +153,30 @@ export default({
         log.log(LOG, "invalid");
         return;
       }
-
+      //get the array of previousReading's ids   
+      log.debug(LOG,"previousReading", props.previousReading);
+      //check if the previous reading exist
+      
+        
+      if (props.previousReading) {
+        const previousReadingId= props.previousReading.id;
+        log.debug(LOG,"previousReadingsId", { prev: previousReadingId, 
+          prevDate: new Date(date.value), date:new Date(props.previousReading.date).getDate(),
+        });
+        //calculate the average
+        const a = new Date(date.value);
+        const b = new Date(props.previousReading.date);
+        
+        const result = dateDiffInDays(b, a);
+        log.debug(LOG,"days between dates", a);
+        log.debug(LOG,"value utc1", b);
+        average.value = ((
+          value.value - props.previousReading.value) / 
+            result).toFixed(3);
+        log.debug(LOG,"calculatedAverage", average.value);
+      }
+      
+      //add to db   
       const { add } = repo;
       try {
         await run(
@@ -146,11 +184,13 @@ export default({
             value: value.value,
             date: date.value,
             comment: comment.value,
+            average: average.value,
             meter_id: props.currMeterId,
           })
         );
         shouldReloadData.value = true;
-        router.push(`/usage/${props.currMeterId}`);
+        router.push('/usage');
+        //`/usage/${props.currMeterId}`
         closeModal();
       } catch (ex) {
         log.error(ex);
