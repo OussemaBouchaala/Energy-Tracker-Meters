@@ -13,7 +13,7 @@
             <ion-list>
                 <ion-item>
                     <ion-label v-t="'Settings.darkMode-setting'"></ion-label>
-                    <ion-toggle v-model="darkModeEnabled"></ion-toggle>
+                    <ion-toggle v-model="darkModeEnabled" @ionChange="toggleMode"></ion-toggle>
                 </ion-item>
 
                 <ion-item>
@@ -119,12 +119,19 @@ export default {
             }
         }
         
+        const toggleMode = () => {
+            log.debug(LOG, 'toggleMode', {darkModeEnabled: darkModeEnabled.value});
+            document.body.classList.toggle('dark-theme', darkModeEnabled.value);
+            document.body.classList.toggle('light-theme', !darkModeEnabled.value);
+        }
 
         return {
             darkModeEnabled,
             notificationsEnabled,
             selectedLanguage,
-            setLocale
+            setLocale,
+            toggleMode,
+            
         };
     }
 }

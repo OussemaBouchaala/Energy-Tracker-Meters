@@ -5,7 +5,7 @@ import { IonPage, IonRow, IonCol, IonSpinner, IonGrid } from "@ionic/vue";
 import { pause } from "../utils/helper";
 // import { init } from "../db/utils";
 // import db from "../db";
-import { useI18n } from "vue-i18n";
+//import { useI18n } from "vue-i18n";
 
 
 const name = "splash-screen";
@@ -24,23 +24,21 @@ export default {
   setup(_, context) {
     log.debug(LOG, "setup");
 
-    const { t } = useI18n();
     const running = ref(true);
-    const message = ref("");
+    //const message = ref("");
 
 
     onMounted(async () => {
-      message.value = t("SplashScreen.message-init-db");
+      //message.value = t("SplashScreen.message-init-db");
 
       // await init({ db });
-      await pause(2000);
       running.value = false;
       await pause(1000);
       context.emit("fadeout");
     });
 
     return {
-      message,
+      //message,
       running,
     };
   },
@@ -58,8 +56,7 @@ export default {
           </ion-col>
         </ion-row>
         <ion-row class="ion-justify-content-center">
-          <ion-col class="flex-col">
-            {{ message }}
+          <ion-col v-t="'SplashScreen.message-init-db'" class="flex-col">
           </ion-col>
         </ion-row>
       </ion-grid>

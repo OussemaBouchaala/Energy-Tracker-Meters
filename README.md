@@ -21,6 +21,8 @@ ToDo list:
     - toggle language:
         - register language property in db --------- 100% Done
         - change locale ---------------------------- 100% Done
-    - theme ---------------------------------------- 0%
+    - theme:
+        - register in db --------------------------- 100% Done
+        - change theme ----------------------------- 80%
     - notifications -------------------------------- 0%
 # energy-tracker-master

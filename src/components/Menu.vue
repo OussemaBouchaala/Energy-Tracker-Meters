@@ -85,7 +85,7 @@ export default {
         <ion-menu-toggle>
           <ion-item button @click="() => router.push('/meters')">
             <ion-icon slot="start" :icon="listIcon" />
-            <ion-label v-t="t('App.meter-menu')"></ion-label>
+            <ion-label v-t="'App.meter-menu'"></ion-label>
           </ion-item>
         </ion-menu-toggle>
 
@@ -99,14 +99,14 @@ export default {
         <ion-menu-toggle auto-hide="false">
           <ion-item button @click="() => router.push('/settings')">
             <ion-icon slot="start" :icon="settingsIcon" />
-            <ion-label v-t="t('App.settings-menu')"></ion-label>
+            <ion-label v-t="'App.settings-menu'"></ion-label>
           </ion-item>
         </ion-menu-toggle>
 
         <ion-menu-toggle auto-hide="false">
           <ion-item button @click="() => router.push('/about')">
             <ion-icon slot="start" :icon="infoIcon" />
-            <ion-label v-t="t('App.about-menu')"></ion-label>
+            <ion-label v-t="'App.about-menu'"></ion-label>
           </ion-item>
         </ion-menu-toggle>
       </ion-list>

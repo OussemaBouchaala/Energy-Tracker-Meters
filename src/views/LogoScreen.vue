@@ -70,9 +70,8 @@ export default {
     onMounted(async () => {
       log.debug(LOG, "view mounted");
       // await init({ db });
-      // await pause(3000);
-      context.emit("fadeout");
       tryLoadLocale();
+      context.emit("fadeout");
     });
     
     onIonViewWillEnter(async () => {
