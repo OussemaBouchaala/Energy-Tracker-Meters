@@ -5,6 +5,7 @@ import SplashScreen from "./views/SplashScreen.json";
 import AddReading from "./views/AddReading.json";
 import Readings from "./views/Readings.json";
 import Settings from "./views/Settings.json";
+import Charts from "./views/Charts.json";
 
 export default {
   App,
@@ -14,4 +15,5 @@ export default {
   Meters,
   SplashScreen,
   Settings,
+  Charts, 
 };

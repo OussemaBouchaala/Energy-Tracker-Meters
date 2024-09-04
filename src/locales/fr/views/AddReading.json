@@ -6,5 +6,6 @@
     "label-average": "Moyenne",
     "button-save": "Enregistrer",
     "msg-value-required": "Valeur obligatoire",
-    "msg-date-required": "Date obligatoire"
+    "msg-date-required": "Date obligatoire",
+    "msg-date-min": "La date doit être postérieure à la date de la lecture précédente"
 }

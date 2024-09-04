@@ -14,7 +14,13 @@
             v-t="'AddReading.label-value'"
             :color="submitted && v$.value.$error ? 'danger' : 'black'"
           ></ion-label>
-          <ion-input required v-model="value" type="text"></ion-input>
+          <ion-input required v-model="value" type="text" ></ion-input>
+          <ion-text color="danger" v-if="submitted && v$.value.$error">
+            <small>
+              <!-- Iterate over errors and display the first error message -->
+              {{ v$.value.$errors[0].$message }}
+            </small>
+          </ion-text>
         </ion-item>
         <ion-item>
           <ion-label 
@@ -23,6 +29,12 @@
             :color="submitted && v$.date.$error ? 'danger' : 'black'"
           ></ion-label>
           <ion-input required v-model="date" type="date"></ion-input>
+          <ion-text color="danger" v-if="submitted && v$.date.$error">
+            <small>
+              <!-- Iterate over errors and display the first error message -->
+              {{ v$.date.$errors[0].$message }}
+            </small>
+          </ion-text>
         </ion-item>
         <ion-item>
           <ion-label position="stacked" v-t="'AddReading.label-comment'"></ion-label>
@@ -43,6 +55,7 @@ import {
     IonItem, 
     IonLabel, 
     IonInput,
+    IonText,
     modalController,
 } from '@ionic/vue';
 import log from 'loglevel';
@@ -55,7 +68,7 @@ import { useAppStore } from '../stores/app';
 import useSQLite from "../composables/useSQLite";
 import { useRouter  } from 'vue-router';
 import { storeToRefs } from 'pinia';
-import { required, helpers } from "@vuelidate/validators";
+import { required, helpers, minValue } from "@vuelidate/validators";
 
 const name="NewReading";
 const { withMessage } = helpers;
@@ -63,6 +76,8 @@ const LOG = `[component|${name}]`;
 
 // a and b are javascript Date objects
 function dateDiffInDays(a, b) {
+  a= new Date(a);
+  b= new Date(b);
   const _MS_PER_DAY = 1000 * 60 * 60 * 24;
   // Discard the time and time-zone information.
   const utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
@@ -82,7 +97,8 @@ export default({
     IonTitle, 
     IonButtons, 
     IonItem, 
-    IonLabel, 
+    IonLabel,
+    IonText,
     IonInput,
   },
   props:{
@@ -92,6 +108,10 @@ export default({
     },
     previousReading: {
       type: Object,
+      required: true
+    },
+    currMeterInitVal:{
+      type: String,
       required: true
     }
   },
@@ -107,33 +127,50 @@ export default({
     const isDateOpen = ref(false);
     const { t } = useI18n();
     const value = ref('');
-    const date = ref('');
+    const now = ref(new Date());
+    const nowDate = now.value.toISOString().split('T')[0];
+    const date = ref(nowDate);
     const comment = ref('');
     const average = ref(0.0);
     const submitted = ref(false);
-    const now = ref(new Date());
-    const nowDate = now.value.toISOString().split('T')[0];
 
     const dateInput = () => {
       log.debug("dateInput");
       isDateOpen.value = true;
     }; 
-
-    // const closeModal = () => {
-    //   isModalOpen.value = false;
-    //   context.emit('update:isVisibleForm' , false);
-    // };
     
     const closeModal = () => {
       modalController.dismiss();
     };
 
+    // Custom validator to check if the date is not in the past
+    const isNotValid = (dat) => {
+      if (!dat) return true; // If no value, return true to satisfy required validator first
+      if(props.previousReading){
+        const previousReadingDate = new Date(props.previousReading.date);
+        const selectedDate = new Date(dat);
+        return selectedDate >= previousReadingDate;
+      }
+      return true
+    };
+    //input validation
     const rules = {
       value: {
         required: withMessage(t("AddReading.msg-value-required"), required),
+        minValue: withMessage(
+          t("AddReading.msg-value-min"),
+          minValue(props.previousReading? props.previousReading.value: props.currMeterInitVal? props.currMeterInitVal: 0)),
       },
       date: {
         required: withMessage(t("AddReading.msg-date-required"), required),
+        // minValue: withMessage(
+        //   t("AddReading.msg-date-min"),
+        //   minValue(new Date(props.previousReading? props.previousReading.date: null))
+        // ),
+        minValue: withMessage(
+          t("AddReading.msg-date-min"),
+          isNotValid
+        ),
       },
     };
     const v$ = useVuelidate(rules, { value, date }, { $autoDirty: true });
@@ -144,7 +181,7 @@ export default({
         value: value.value,
         date: date.value,
       };
-
+      log.debug(LOG,"previousReading", props.previousReading);
       submitted.value = true;
       $v.$touch();
       var valid = await $v.$validate();
@@ -154,7 +191,7 @@ export default({
         return;
       }
       //get the array of previousReading's ids   
-      log.debug(LOG,"previousReading", props.previousReading);
+      
       //check if the previous reading exist
       
         
@@ -164,8 +201,8 @@ export default({
           prevDate: new Date(date.value), date:new Date(props.previousReading.date).getDate(),
         });
         //calculate the average
-        const a = new Date(date.value);
-        const b = new Date(props.previousReading.date);
+        const a = date.value;
+        const b = props.previousReading.date;
         
         const result = dateDiffInDays(b, a);
         log.debug(LOG,"days between dates", a);
@@ -189,8 +226,8 @@ export default({
           })
         );
         shouldReloadData.value = true;
-        router.push('/usage');
-        //`/usage/${props.currMeterId}`
+        //router.push('/usage');
+        router.replace(`/usage/${props.currMeterId}`)
         closeModal();
       } catch (ex) {
         log.error(ex);

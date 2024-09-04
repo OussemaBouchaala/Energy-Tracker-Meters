@@ -57,7 +57,7 @@ export default {
     const store = useAppStore();
     const router = useRouter();
     const { ready, run } = useSQLite();
-    const { shouldReloadData } = storeToRefs(store);
+    const { shouldReloadData, shouldReloadUsage } = storeToRefs(store);
 
     const name = ref("");
     const unit = ref("");
@@ -103,6 +103,7 @@ export default {
           })
         );
         shouldReloadData.value = true;
+        shouldReloadUsage.value = true;
         router.replace("/meters");
       } catch (ex) {
         log.error(ex);

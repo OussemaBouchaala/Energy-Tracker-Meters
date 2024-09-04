@@ -6,8 +6,8 @@ ToDo list:
     - add new readings:
         - reading add ------------------------------ 100% Done
         - readings unique to a meter --------------- 100% Done
-        - constraint of date ----------------------- 0%
-        - value constraint ------------------------- 0%
+        - constraint of date ----------------------- 100% Done
+        - value constraint ------------------------- 100% Done
         - edit comment ----------------------------- 100% Done
         - delete reading --------------------------- 100% Done
         - average :
@@ -16,7 +16,7 @@ ToDo list:
             * calculate average -------------------- 100% Done
     - add charts:
         - charts component ------------------------- 100% Done
-        - build charts ----------------------------- 8%
+        - build charts ----------------------------- 88%
 - settings:
     - toggle language:
         - register language property in db --------- 100% Done

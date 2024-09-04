@@ -6,6 +6,8 @@
     "label-average": "Average",
     "button-save": "Save",
     "msg-value-required": "Value required",
-    "msg-Date-required": "Date required"
+    "msg-date-required": "Date required",
+    "msg-date-min": "Date should be after the previous reading date",
+    "msg-value-min": "Value should be greater than start value and the previous reading value"
 }
   

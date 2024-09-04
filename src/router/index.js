@@ -34,9 +34,10 @@ const routes = [
     props: true,
   },
   {
-    path: "/usage/charts",
+    path: "/usage/charts/:id",
     name: "chart",
     component: () => import("../views/Charts.vue"),
+    props: true,
   },
   {
     path: "/settings",

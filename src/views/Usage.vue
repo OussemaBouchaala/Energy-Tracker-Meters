@@ -30,7 +30,7 @@ import repo from "../db/repo/meters";
 import { useAppStore } from "../stores/app";
 import { storeToRefs } from "pinia";
 
-const name = "Meters";
+const name = "Usage";
 const LOG = `[component|${name}]`;
 
 export default {
@@ -58,7 +58,7 @@ export default {
     const store = useAppStore();
     const { ready, query } = useSQLite();
 
-    const { shouldReloadData } = storeToRefs(store);
+    const { shouldReloadData, shouldReloadUsage } = storeToRefs(store);
 
     const loading = ref(false);
     const router = useRouter();
@@ -82,25 +82,27 @@ export default {
 
     showLoading();
 
-    onMounted(async () => {
+    onMounted(async () => {      
       log.debug(LOG, "view mounted");
       tryLoadData();
     });
 
     onIonViewWillEnter(async () => {
-      if (!shouldReloadData.value) return;
+      if (!shouldReloadUsage.value) return;
       log.debug(LOG, "view will enter");
       await showLoading();
     });
 
     onIonViewDidEnter(async () => {
-      if (!shouldReloadData.value) return;
+      log.debug(LOG, "view did enter", shouldReloadData.value );
+      if (!shouldReloadUsage.value) return;
       log.debug(LOG, "view did enter");
       tryLoadData();
     });
 
     const tryLoadData = () => {
-      shouldReloadData.value = false;
+      //shouldReloadData.value = false;
+      shouldReloadUsage.value = false;
       retrier
         .resolve((attempt) => loadData(attempt))
         .then(

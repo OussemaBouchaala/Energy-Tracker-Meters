@@ -35,8 +35,8 @@ import { ref, onMounted, computed } from 'vue';
 import { Retrier } from '@jsier/retrier';
 import repo from "../db/repo/readings";
 import { useAppStore } from '../stores/app';
-import useSQLite from "../composables/useSQLite";
-import { useRouter  } from 'vue-router';
+import useSQLite from "../composables/useSQLite"
+
 import { storeToRefs } from 'pinia';
 
 const name="NewReading";
@@ -67,7 +67,6 @@ export default({
   setup(props) {
     log.debug(LOG, "setup");
 
-    const router = useRouter();
     const store = useAppStore();
     const {run,ready, querySingle} = useSQLite();
     const { shouldReloadData } = storeToRefs(store);
@@ -153,12 +152,15 @@ export default({
       try {
         await run(
           update({
+            date: data.date,
+            value: data.value,
             comment: comment.value,
+            average: data.average,
+            meter_id: data.meter_id,
             id: parseInt(props.commentId)
           })
         );
         shouldReloadData.value = true;
-        router.push('/meters-readings');
         closeModal();
       } catch (ex) {
         log.error(ex);

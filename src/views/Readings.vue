@@ -19,8 +19,8 @@ import {
     IonItemSliding,
     IonItemOption,
     IonItemOptions,
-    onIonViewWillEnter, 
-    onIonViewDidEnter,
+    // onIonViewWillEnter, 
+    // onIonViewDidEnter,
     modalController,
     IonFabList,
 } from '@ionic/vue';
@@ -52,7 +52,7 @@ import { storeToRefs } from "pinia";
 import { useAppStore } from "../stores/app";
 
 const { getById } = repo1;
-const name = "Reading";
+const name = "Readings";
 const LOG = `[view|${name}]`;
 
 export default {
@@ -91,6 +91,7 @@ export default {
 
         const { t } = useI18n();
 
+        useI18n();
         const store = useAppStore();
         const router = useRouter();
         
@@ -98,11 +99,11 @@ export default {
         
         const loading = ref(false);
         const readings = ref([]);
-        const name = ref("");
-        const currentId = ref("");
-        //const isVisibleForm = ref(false)
-        let data = null;
-        let nameData = null;
+        const currMeter = ref([]);
+        const initialVal = ref("");
+        const currentReadingId = ref("");
+        let readingsData = null;
+        let meterData = null;
 
         const { shouldReloadData } = storeToRefs(store);
         const { showLoading, hideLoading } = store;
@@ -122,15 +123,31 @@ export default {
         const retrier = new Retrier(retrierOptions);
 
         showLoading();
+
+        onMounted(async () => {
+            log.debug(LOG, "view mounted");
+            tryLoadData();
+        });
+        
+        //control reload data
+        watch(()=>
+        shouldReloadData.value, async (newValue) => {
+            log.debug(LOG, "shouldReloadData changed",  newValue );
+            if (newValue) {
+                await showLoading();
+                tryLoadData();
+            }
+        });
    
+        //to edit comment popup
         const editComment = async (item) => {
-            currentId.value =  item.id;
+            currentReadingId.value =  item.id;
           //log.debug(LOG, "edit comment",  item.id );
-            log.debug(LOG, "edit comment222",  currentId.value );
+            log.debug(LOG, "edit comment222",  currentReadingId.value );
             const modal = await modalController.create({
                 component: EditComment,
                 componentProps: {
-                    commentId: currentId.value,
+                    commentId: currentReadingId.value,
                 },
                 cssClass: 'edit-comment-class',
                 swipeToClose: true,
@@ -142,6 +159,7 @@ export default {
             return modal.present();
         };
 
+        //to add reading popup
         const toAddReading = async () => {
             log.debug(LOG, "new reading");
             const modal = await modalController.create({
@@ -149,6 +167,7 @@ export default {
                 componentProps: {
                     currMeterId: props.id,
                     previousReading: readings.value[0],
+                    currMeterInitVal: initialVal.value,
                 },
                 cssClass: 'add-reading-class',
                 swipeToClose: true,
@@ -157,67 +176,39 @@ export default {
             return modal.present();
         };
 
-        //copied code
-
-        useI18n();
-
-        showLoading();
-
-        onMounted(async () => {
-            log.debug(LOG, "view mounted");
-            tryLoadData();
-        });
-
-        onIonViewWillEnter(async () => {
-            if (!shouldReloadData.value) return;
-            log.debug(LOG, "view will enter");
-            await showLoading();
-        });
-
-        onIonViewDidEnter(async () => {
-            if (!shouldReloadData.value) return;
-            log.debug(LOG, "view did enter");
-            tryLoadData();
-        });
+        //load readings
 
         const tryLoadData = () => {
             shouldReloadData.value = false;
             retrier
                 .resolve((attempt) => loadData(attempt))
                 .then(
-                async () => {
-                    log.debug(LOG, "data loaded");
-                    await hideLoading();
-                },
-                async () => {
-                    log.debug(LOG, "load data failed");
-                    await hideLoading();
-                }
+                    async () => {
+                        log.debug(LOG, "data loaded");
+                        await hideLoading();
+                    },
+                    async () => {
+                        log.debug(LOG, "load data failed");
+                        await hideLoading();
+                    }
                 );
         };
-
-        watch(ready, (newValue) => {
-            log.debug(LOG, "Database ready state changed", { ready: newValue });
-            if (newValue) {
-                tryLoadData();
-            }
-        });
 
         const loadData = async (attempt) => {
             log.debug(LOG, "load readings", { attempt, id: props.id });
             if (!ready.value) {
-                log.error(LOG, "Database not ready");
                 throw new Error("fail to load data");
             }
 
             try {
-                nameData = await querySingle(getById({ id: parseInt(props.id) }));
-                data = await query(repo.getAll({ meter_id: parseInt(props.id) }));
-                data = data.reverse();
-                log.debug(LOG, "Loaded readings data",  data );
-                readings.value = data;
-                name.value = nameData;
-                log.debug(LOG, "Loaded name", { name: name.value });
+                meterData = await querySingle(getById({ id: parseInt(props.id) }));
+                readingsData = await query(repo.getAll({ meter_id: parseInt(props.id) }));
+                readingsData = readingsData.reverse();
+                log.debug(LOG, "Loaded readings readingsData",  readingsData );
+                readings.value = readingsData;
+                currMeter.value = meterData;
+                initialVal.value = meterData.startValue
+                log.debug(LOG, "Loaded name", { name: currMeter.value.name, initVal: initialVal.value });
                 log.debug(LOG, "Loaded readings", { readings: readings.value });
             } catch (err) {
                 log.error(LOG, "Error loading data", err);
@@ -225,6 +216,7 @@ export default {
             }
         };
 
+        // to confirm delete popup
         const confirmDelete = async (item) => {
             log.debug(LOG, "confirm delete", { item });
             const modal = await modalController.create({
@@ -247,12 +239,13 @@ export default {
             return modal.present();
         };
         
-       const toAddChart = () => {
+        // to add chart popup
+        const toAddChart = () => {
             log.debug(LOG, "new chart");
-            router.push("/usage/charts");
+            router.push(`/usage/charts/${props.id}`);
         };
         
-
+        // delete reading
         const deleteItem = async (readingId) => {
             try {
                 // Await the result of deleteById to ensure the operation completes
@@ -280,7 +273,7 @@ export default {
         return {
             toAddReading,
             t,
-            name,
+            currMeter,
             addIcon,
             deleteIcon,
             editIcon,
@@ -290,7 +283,7 @@ export default {
             editComment,
             deleteItem,
             confirmDelete,
-            currentId,
+            currentReadingId,
             toAddChart,
             readings,
             ready,
@@ -310,7 +303,7 @@ export default {
                 <ion-buttons slot="start">
                     <ion-back-button default-href="/usage" />
                 </ion-buttons>
-                <ion-title>{{ name.name }}</ion-title>
+                <ion-title>{{ currMeter.name }}</ion-title>
             </ion-toolbar>
         </ion-header>
         <ion-content>
@@ -332,11 +325,11 @@ export default {
                             </ion-label>
                             <ion-label slot="end" position="fixed">
                                 <span v-t="'AddReading.label-average'"></span>
-                                <span>:<br>{{ item.average }}{{ name.unit }}/jr</span>
+                                <span>:<br>{{ item.average }} {{ currMeter.unit }}/jr</span>
                             </ion-label>
                             <ion-label slot="end" position="fixed">
                                 <span v-t="'AddReading.label-value'"></span>
-                                <span>:<br>{{ item.value }}{{ name.unit }}</span>
+                                <span>:<br>{{ item.value }} {{ currMeter.unit }}</span>
                             </ion-label>
                         </ion-item>
                     </ion-list>
@@ -397,12 +390,12 @@ ion-item {
 <style>
 .add-reading-class {
     --width: 80%;
-    --height: 70%;
+    --height: 64%;
     --border-radius: 10px;
 }
 .edit-comment-class{
     --width:80%;
-    --height:40%;
+    --height:35%;
     --border-radius: 10px;
 }
 .confirm-dialog-class {

@@ -9,6 +9,7 @@ export const useAppStore = defineStore(id, {
   state() {
     return {
       shouldReloadData: false,
+      shouldReloadUsage: false,
       multiselect: false,
       loading: false,
       version: process.env.VUE_APP_VERSION,
@@ -16,6 +17,10 @@ export const useAppStore = defineStore(id, {
     };
   },
   actions: {
+    reloadData(newVal) {
+      log.debug(LOG, "[A|reloadData]");
+      this.shouldReloadData = newVal;
+    },
     showLoading() {
       log.debug(LOG, "[A|showLoading]");
       this.loading = true;
