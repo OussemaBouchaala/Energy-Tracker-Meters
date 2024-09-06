@@ -245,8 +245,8 @@ http://ionicframework.com/docs/theming/ */
   * -------------------------------------------
   */
 body.light-theme {
-  --ion-background-color: #ffffff;
-  --ion-background-color-rgb: 255,255,255;
+  --ion-background-color: #ededed;
+  --ion-background-color-rgb: 237,237,237;
 
   --ion-text-color: #000000;
   --ion-text-color-rgb: 0,0,0;
@@ -273,19 +273,16 @@ body.light-theme {
   --ion-color-step-900: #6e6e6e;
   --ion-color-step-950: #5f5e5e;
 
-  --ion-menu-button-color: white;
+  --ion-menu-button-color: #000000;
 
-  --ion-item-background: #f0efef;
+  --ion-item-background: #e1e1e1;
 
-  --ion-toolbar-background: #f5f5f5;
+  --ion-toolbar-background: #e0e0e0;
 
-  --ion-tab-bar-background: #f5f5f5;
+  --ion-tab-bar-background: #e0e0e0;
 
-  --ion-card-background: #f0efef;
+  --ion-card-background: #e1e1e1;
   /* Add any other variable overrides for light theme here */
-}
-ion-menu-button {
-  color: var(--ion-menu-button-color);
 }
 
 body.dark-theme {
@@ -297,34 +294,37 @@ body.dark-theme {
 
   --ion-border-color: #222222;
 
-    --ion-color-step-50: #1e1e1e;
-    --ion-color-step-100: #2a2a2a;
-    --ion-color-step-150: #363636;
-    --ion-color-step-200: #414141;
-    --ion-color-step-250: #4d4d4d;
-    --ion-color-step-300: #595959;
-    --ion-color-step-350: #656565;
-    --ion-color-step-400: #717171;
-    --ion-color-step-450: #7d7d7d;
-    --ion-color-step-500: #898989;
-    --ion-color-step-550: #949494;
-    --ion-color-step-600: #a0a0a0;
-    --ion-color-step-650: #acacac;
-    --ion-color-step-700: #b8b8b8;
-    --ion-color-step-750: #c4c4c4;
-    --ion-color-step-800: #d0d0d0;
-    --ion-color-step-850: #dbdbdb;
-    --ion-color-step-900: #e7e7e7;
-    --ion-color-step-950: #f3f3f3;
+  --ion-color-step-50: #1e1e1e;
+  --ion-color-step-100: #2a2a2a;
+  --ion-color-step-150: #363636;
+  --ion-color-step-200: #414141;
+  --ion-color-step-250: #4d4d4d;
+  --ion-color-step-300: #595959;
+  --ion-color-step-350: #656565;
+  --ion-color-step-400: #717171;
+  --ion-color-step-450: #7d7d7d;
+  --ion-color-step-500: #898989;
+  --ion-color-step-550: #949494;
+  --ion-color-step-600: #a0a0a0;
+  --ion-color-step-650: #acacac;
+  --ion-color-step-700: #b8b8b8;
+  --ion-color-step-750: #c4c4c4;
+  --ion-color-step-800: #d0d0d0;
+  --ion-color-step-850: #dbdbdb;
+  --ion-color-step-900: #e7e7e7;
+  --ion-color-step-950: #f3f3f3;
 
-    --ion-item-background: #1e1e1e;
+  --ion-item-background: #1e1e1e;
 
-    --ion-toolbar-background: #1f1f1f;
+  --ion-toolbar-background: #1f1f1f;
 
-    --ion-tab-bar-background: #1f1f1f;
+  --ion-tab-bar-background: #1f1f1f;
 
-    --ion-card-background: #1e1e1e;
+  --ion-card-background: #1e1e1e;
   /* Add any other variable overrides for dark theme here */
+}
+ion-menu-button::part(native) {
+  color: var(--ion-menu-button-color);
 }
 /* .light-theme{
   --ion-background-color: #ffffff;

@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS readings(
 );
 
 INSERT INTO options (name, value) VALUES ('locale', 'en');
-INSERT INTO options (name, value) VALUES ('theme', 'dark');
+INSERT INTO options (name, value) VALUES ('darkMode', '1');
 `
 
 //`;

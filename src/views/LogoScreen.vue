@@ -70,7 +70,7 @@ export default {
     onMounted(async () => {
       log.debug(LOG, "view mounted");
       // await init({ db });
-      tryLoadLocale();
+      tryLoadOptions();
       context.emit("fadeout");
     });
     
@@ -100,36 +100,42 @@ export default {
     };
     const retrier = new Retrier(retrierOptions);
 
-    const tryLoadLocale = () => {
+    const tryLoadOptions = () => {
       shouldReloadData.value = false;
       retrier
-        .resolve((attempt) => loadLocale(attempt))
+        .resolve((attempt) => loadOptions(attempt))
         .then(
           async () => {
-            log.debug(LOG, "locale loaded");
+            log.debug(LOG, "Options loaded");
             await hideLoading();
           },
           async () => {
-            log.debug(LOG, "load locale failed");
+            log.debug(LOG, "load Options failed");
             await hideLoading();
           }
         );
     };
 
-    const loadLocale = async (attempt) => {
-        log.debug(LOG, "load locale", { attempt });
-        if (!ready.value) throw new Error("fail to load locale");
+    const loadOptions = async (attempt) => {
+      log.debug(LOG, "load Options", { attempt });
+      if (!ready.value) throw new Error("fail to load Options");
 
-        try {
-          const newLocale = await querySingle(repo.getByName({name: 'locale'}));
-          log.debug(LOG, "locale loaded", { newLocale });
-          locale.value = newLocale.value;
-          log.debug(LOG, "locale set", { locale: locale.value });
-        } catch (err) {
-            log.error(err.message);
-        throw err;
-        }
+      try {
+        const newLocale = await querySingle(repo.getByName({name: 'locale'}));
+        const fetchedTheme = await querySingle(repo.getByName({name: 'darkMode'}));
+        log.debug(LOG, "theme loaded", { fetchedTheme });
+        log.debug(LOG, "locale loaded", { newLocale });
+        locale.value = newLocale.value;
+        document.body.classList.toggle('dark-theme',parseInt(fetchedTheme.value));
+        document.body.classList.toggle('light-theme',!(parseInt(fetchedTheme.value)));
+        log.debug(LOG, "theme set", { theme: parseInt(fetchedTheme.value) });
+        log.debug(LOG, "locale set", { locale: locale.value });
+      } catch (err) {
+          log.error(err.message);
+      throw err;
+      }
     };
+    
 
   },
 };

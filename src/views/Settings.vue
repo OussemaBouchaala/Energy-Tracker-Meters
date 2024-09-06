@@ -52,12 +52,13 @@ import {
     IonMenuButton
 } from '@ionic/vue';
 
-import { ref } from 'vue';
+import { ref , onMounted} from 'vue';
 import { useAppStore } from '../stores/app';
 import useSQLite from '../composables/useSQLite';
 import  repo from '../db/repo/options';
 import { useI18n } from 'vue-i18n';
-//import { storeToRefs } from 'pinia';
+import { Retrier } from "@jsier/retrier";
+import { storeToRefs } from 'pinia';
 
 const { update } = repo
 const name = 'Settings';
@@ -86,18 +87,67 @@ export default {
 
         const { locale } = useI18n();
         const store = useAppStore();
-        const { run } = useSQLite();
-        //const { shouldReloadData } = storeToRefs(store);
-
-
+        const {run, ready, querySingle } = useSQLite();
         const { showLoading, hideLoading } = store;
-
+        const { shouldReloadData } = storeToRefs(store);
 
         // end injected code
         const darkModeEnabled = ref(true);
         const notificationsEnabled = ref(true);
         const selectedLanguage = ref(locale.value);
 
+        // fetch theme
+
+        onMounted(async () => {
+            log.debug(LOG, "view mounted");
+            tryLoadOptions();
+        });
+
+        const retrierOptions = {
+        limit: 5,
+        firstAttemptDelay: 0,
+        delay: 250,
+        keepRetryingIf: (response, attempt) => {
+            log.debug(LOG, "keepRetryingIf", {
+            response,
+            attempt,
+            });
+            return !ready.value;
+        },
+        };
+        const retrier = new Retrier(retrierOptions);
+
+        const tryLoadOptions = () => {
+        shouldReloadData.value = false;
+        retrier
+            .resolve((attempt) => loadOptions(attempt))
+            .then(
+            async () => {
+                log.debug(LOG, "Options loaded");
+                await hideLoading();
+            },
+            async () => {
+                log.debug(LOG, "load Options failed");
+                await hideLoading();
+            }
+            );
+        };
+
+        const loadOptions = async (attempt) => {
+        log.debug(LOG, "load Options", { attempt });
+        if (!ready.value) throw new Error("fail to load Options");
+
+        try {
+            const fetchedTheme = await querySingle(repo.getByName({name: 'darkMode'}));
+            log.debug(LOG, "theme loaded", { theme: parseInt(fetchedTheme.value) });
+            darkModeEnabled.value = Boolean(parseInt(fetchedTheme.value));
+        } catch (err) {
+            log.error(err.message);
+        throw err;
+        }
+        };
+
+        // end
         const setLocale = async (event) => {
             log.debug(LOG,'event', {event, currentLocale: locale.value,selectedLanguage: selectedLanguage.value});
             try {
@@ -110,7 +160,6 @@ export default {
                     })
                 );
                 log.debug(LOG, 'locale updated');
-                //shouldReloadData.value = true;
             } catch (ex) {
                 log.error(ex);
             } finally {
@@ -119,10 +168,27 @@ export default {
             }
         }
         
-        const toggleMode = () => {
-            log.debug(LOG, 'toggleMode', {darkModeEnabled: darkModeEnabled.value});
-            document.body.classList.toggle('dark-theme', darkModeEnabled.value);
-            document.body.classList.toggle('light-theme', !darkModeEnabled.value);
+        const toggleMode = async () => {
+            const test =(Number(darkModeEnabled.value)).toString()
+            log.debug(LOG,'toggleMode', {test: test});
+            document.body.classList.toggle('dark-theme',darkModeEnabled.value);
+            document.body.classList.toggle('light-theme',!darkModeEnabled.value);
+            try {
+                await showLoading();
+                await run(
+                    update({
+                        name: 'darkMode',
+                        value: (Number(darkModeEnabled.value)).toString(),
+                        id: 2,
+                    })
+                );
+                log.debug(LOG, 'theme updated');
+                //shouldReloadData.value = true;
+            } catch (ex) {
+                log.error(ex);
+            } finally {
+                await hideLoading();
+            }
         }
 
         return {

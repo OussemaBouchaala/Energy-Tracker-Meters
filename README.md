@@ -23,6 +23,6 @@ ToDo list:
         - change locale ---------------------------- 100% Done
     - theme:
         - register in db --------------------------- 100% Done
-        - change theme ----------------------------- 80%
+        - change theme ----------------------------- 100% Done
     - notifications -------------------------------- 0%
 # energy-tracker-master
