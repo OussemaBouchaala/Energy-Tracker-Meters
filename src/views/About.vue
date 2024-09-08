@@ -7,7 +7,7 @@ import {
   IonToolbar,
   IonButtons,
   IonContent,
-  IonBackButton,
+  IonMenuButton,
   IonItem,
   IonLabel,
   IonNote,
@@ -26,7 +26,7 @@ export default {
     IonContent,
     IonToolbar,
     IonButtons,
-    IonBackButton,
+    IonMenuButton,
     IonItem,
     IonLabel,
     IonNote,
@@ -52,7 +52,7 @@ export default {
     <ion-header translucent>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button color="dark" text="" />
+          <ion-menu-button color="dark"/>
         </ion-buttons>
         <ion-title v-t="'App.about-menu'"></ion-title>
       </ion-toolbar>

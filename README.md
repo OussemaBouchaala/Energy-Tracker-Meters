@@ -9,14 +9,17 @@ ToDo list:
         - constraint of date ----------------------- 100% Done
         - value constraint ------------------------- 100% Done
         - edit comment ----------------------------- 100% Done
-        - delete reading --------------------------- 100% Done
+        - delete reading:
+            * delete action ------------------------ 100% Done
+            * delete constraint -------------------- 0%
         - average :
             * add average property ----------------- 100% Done
             * fetch previous reading data if exist-- 100% Done
             * calculate average -------------------- 100% Done
     - add charts:
         - charts component ------------------------- 100% Done
-        - build charts ----------------------------- 88%
+        - build charts ----------------------------- 100% Done
+        - popup for customize build ---------------- 0%
 - settings:
     - toggle language:
         - register language property in db --------- 100% Done

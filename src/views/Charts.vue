@@ -5,13 +5,14 @@
                 <ion-buttons slot="start">
                     <ion-back-button default-href="{{name: 'meter-readings'}}" />
                 </ion-buttons>
-                <ion-title>Charts</ion-title>
+                <ion-title>Charts for "{{meterName}}"</ion-title>
             </ion-toolbar>
         </ion-header>
 
         <ion-content>
             <div class="chart-container">
-                <canvas id="myChart" width="400" height="200"></canvas>
+                <canvas id="averages" width="400" height="258"></canvas>
+                <canvas id="values" width="400" height="258"></canvas>
             </div>
         </ion-content>
     </ion-page>
@@ -29,6 +30,7 @@ import {
     IonTitle, 
     IonToolbar
 } from '@ionic/vue';
+import 'chartjs-adapter-moment';
 import { ref, onMounted } from "vue";
 import repo from "../db/repo/readings";
 import repo1 from "../db/repo/meters";
@@ -78,6 +80,7 @@ export default{
         let currentMeter = null;
         const averages =  ref([]);
         const dates = ref([]);
+        const values = ref([]);
 
         const { shouldReloadData } = storeToRefs(store);
         const { showLoading, hideLoading } = store;
@@ -100,17 +103,19 @@ export default{
         onMounted(() => {
             tryLoadAndCreateChart();
         });
-
+        let chart;
         // Create a new chart instance
-        const createChart = () => {
-            const ctx = document.getElementById('myChart').getContext('2d');
-            new Chart(ctx, {
+        const createChart = (ctx,labels,datasetLabel,data,minDate,destroy=false) => {
+            if (destroy && chart) {
+                chart.destroy();
+            }
+            chart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels:  dates.value,
+                    labels:  labels,
                     datasets: [{
-                        label: meterName.value,
-                        data: averages.value,
+                        label: datasetLabel,
+                        data: data,
                         backgroundColor: [
                             'rgba(255, 99, 132, 0.2)',
                             'rgba(54, 162, 235, 0.2)',
@@ -131,13 +136,31 @@ export default{
                     }]
                 },
                 options: {
+                    responsive: true,
                     scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'month',
+                                tooltipFormat: 'DD MMM YYYY',
+                                displayFormats: {
+                                    month: 'MMM'
+                                }
+                            },
+                            min: minDate,
+                        },
                         y: {
                             beginAtZero: true
+                        }
+                    },
+                    layout: {
+                        padding: {
+                            right: 10 // Add some padding to accommodate scrolling
                         }
                     }
                 }
             });
+            return chart;
         }
         
         const tryLoadAndCreateChart = () => {
@@ -155,7 +178,27 @@ export default{
                     }
                 )
                 .then(() => {
-                    createChart();
+                    const month = new Date(dates.value[0]).getMonth()
+                    const year = new Date(dates.value[0]).getFullYear();
+                    const firstDate = new Date(year, month, 1);
+                    log.debug(LOG, "First date", firstDate);
+                    createChart(
+                        document.getElementById('averages').getContext('2d'),
+                        dates.value,
+                        t('Charts.evolution-averages'),
+                        averages.value,
+                        firstDate,
+                        true
+                    );
+                    log.debug(LOG, "Chart1 created");
+                    createChart(
+                        document.getElementById('values').getContext('2d'),
+                        dates.value,
+                        t('Charts.evolution-values'),
+                        values.value,
+                        firstDate
+                    );
+                    log.debug(LOG, "Chart2 created");
                 });
         };
 
@@ -173,14 +216,15 @@ export default{
                 readings.value.forEach(reading => {
                     averages.value.push(reading.average);
                     dates.value.push(reading.date);
+                    values.value.push(reading.value);
                 });
-                log.debug(LOG, "Loaded averages", averages);
+                log.debug(LOG, "Loaded data", {averages: averages.value, dates: dates.value, values: values.value});
                 // forEach(readings.value, (reading, i) => {
                 //     //const reading = readings.value[i];
                 //     const average = reading.values.reduce((sum, value) => sum + value, 0) / reading.values.length;
                 //     averages.push(average);
                 // })
-                meterName.value = t('Charts.evolution')+ ' " ' + currentMeter.name+' "';
+                meterName.value = currentMeter.name
                 log.debug(LOG, "Loaded name:", meterName.value );
                 log.debug(LOG, "Loaded readings", { readings: readings.value });
             } catch (err) {
@@ -190,7 +234,8 @@ export default{
         };
 
         return {
-
+            t,
+            meterName,
         };
     }
 };

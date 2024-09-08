@@ -19,8 +19,7 @@ import {
     IonItemSliding,
     IonItemOption,
     IonItemOptions,
-    // onIonViewWillEnter, 
-    // onIonViewDidEnter,
+    IonAlert,
     modalController,
     IonFabList,
 } from '@ionic/vue';
@@ -78,6 +77,7 @@ export default {
         IonItemSliding,
         IonItemOption,
         IonItemOptions,
+        IonAlert,
     },
     props: {
         id: {
@@ -94,6 +94,14 @@ export default {
         useI18n();
         const store = useAppStore();
         const router = useRouter();
+        const isAlertOpen = ref(false);
+        const alertButtons = [
+            {
+                text: 'OK',
+                role: 'cancel',
+                cssClass: 'error-button'
+            }
+        ];
         
         const { ready, query, querySingle, run } = useSQLite();
         
@@ -247,11 +255,17 @@ export default {
         
         // delete reading
         const deleteItem = async (readingId) => {
+            const readingIds = readings.value.map(item => item.id);
+            log.debug(LOG, "deleteID", { readingId, readingIds });
+            if(readingId !== readingIds[0]){
+                isAlertOpen.value = true;
+                throw new Error("Cannot delete this reading");
+            }
             try {
                 // Await the result of deleteById to ensure the operation completes
-                const result = await run (
+                const result = await run(
                     repo.deleteById({ id: readingId })
-                )
+                );
                 // Log the result of the deletion
                 log.debug(LOG, "delete result reading", { result });
 
@@ -289,6 +303,9 @@ export default {
             ready,
             loading,
             refresh,
+            deleteError: t("Readings.msg-delete-error"),
+            isAlertOpen,
+            alertButtons,
         };
     },
 }
@@ -307,6 +324,14 @@ export default {
             </ion-toolbar>
         </ion-header>
         <ion-content>
+            <ion-alert
+                :is-open="isAlertOpen"
+                header="Error"
+                :message="deleteError"
+                :buttons="alertButtons"
+                css-class="error-alert"
+                @did-dismiss="isAlertOpen = false">
+            </ion-alert>
             <ion-refresher slot="fixed" :hidden="!loading" @ionRefresh="refresh">
                 <ion-refresher-content></ion-refresher-content>
             </ion-refresher>
@@ -376,16 +401,23 @@ export default {
 </template>
 
 <style scoped>
-ion-item {
+.dark-theme ion-item {
     --background: transparent;
     --color: #fff;
 
-    --background-hover: rgba(128, 128, 128, 0.911);
-    --border-color: #fff;
-    --border-style: dashed;
-    --border-width: 2px;
+    --border-width: 0 0 1px 0; /* Sets the bottom border to 2px */
 
-  }
+    --border-color: #fff; /* Color of the bottom border */
+    --border-style: solid;
+}
+.light-theme ion-item {
+    --background: transparent;
+    --color: #000;
+
+    --border-color: #000;
+    --border-buttom-style: solid;
+    --border-width: 0 0 1px 0;
+}
 </style>
 <style>
 .add-reading-class {
@@ -403,4 +435,36 @@ ion-item {
     --height: 25%;
     --border-radius: 10px;
 }
+
+.error-alert {
+    padding: 50px;
+}
+.error-alert .alert-title {
+    color: #ff0000; /* Red color for error title */
+    font-weight: bold;
+}
+
+.error-alert .alert-message {
+    color: #ff0000; /* Red color for error message */
+}
+
+
+.error-alert .alert-button-group {
+    background-color: #ff0000; /* Red background color for buttons */
+    display: flex; /* Display buttons in a row */
+    justify-content: center; /* Center buttons */
+    align-items: center; /* Center buttons */
+    padding: 0; /* Remove padding from the buttons */
+    margin: 5px; /* Remove margin from the buttons */
+    border-radius: 5px; /* Round corners */
+}
+
+
+
+.error-alert .alert-button-inner {
+    color: #ffffff;         /* White text color */
+    width: 100%;/* Force button to take full width */
+    text-align: center;       /* Center text inside the button */
+}
+
 </style>

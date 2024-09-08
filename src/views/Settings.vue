@@ -23,7 +23,7 @@
 
                 <ion-item>
                     <ion-label v-t="'Settings.language-setting'"></ion-label>
-                    <ion-select v-model="selectedLanguage" @ionChange="setLocale">
+                    <ion-select :cancelText="cancel" v-model="selectedLanguage" @ionChange="setLocale">
                         <ion-select-option value="en" v-t="'Settings.english-language'"></ion-select-option>
                         <ion-select-option value="fr" v-t="'Settings.french-language'"></ion-select-option>
                     </ion-select>
@@ -85,7 +85,7 @@ export default {
         // injected code
         log.debug(LOG, "setup");
 
-        const { locale } = useI18n();
+        const { t, locale } = useI18n();
         const store = useAppStore();
         const {run, ready, querySingle } = useSQLite();
         const { showLoading, hideLoading } = store;
@@ -197,6 +197,8 @@ export default {
             selectedLanguage,
             setLocale,
             toggleMode,
+            cancel: t('App.button-cancel'),
+            hideLoading,
             
         };
     }
