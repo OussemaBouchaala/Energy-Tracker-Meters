@@ -27,6 +27,7 @@ import {
 import NewReading from '../components/NewReading.vue';
 import EditComment from '../components/EditComment.vue';
 import ConfirmDialog from '../components/ConfirmDialog.vue';
+import BuildChart from '../components/BuildChart.vue';
 
 import log from 'loglevel';
 
@@ -45,8 +46,7 @@ import { Retrier } from "@jsier/retrier";
 import useSQLite from "../composables/useSQLite";
 import { useI18n } from "vue-i18n";
 import {  mdEnterAnimation, mdLeaveAnimation } from '@ionic/core';
-
-import { useRouter } from "vue-router";
+//import { useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 import { useAppStore } from "../stores/app";
 
@@ -93,7 +93,7 @@ export default {
 
         useI18n();
         const store = useAppStore();
-        const router = useRouter();
+        //const router = useRouter();
         const isAlertOpen = ref(false);
         const alertButtons = [
             {
@@ -109,6 +109,7 @@ export default {
         const readings = ref([]);
         const currMeter = ref([]);
         const initialVal = ref("");
+        const errorMessage = ref("");
         const currentReadingId = ref("");
         let readingsData = null;
         let meterData = null;
@@ -247,18 +248,44 @@ export default {
             return modal.present();
         };
         
-        // to add chart popup
-        const toAddChart = () => {
+        //to add chart popup
+        // const toAddChart = () => {
+        //      log.debug(LOG, "new chart");
+        //     router.push(`/usage/charts/${props.id}`);
+        //  };
+        const toAddChart = async () => {
             log.debug(LOG, "new chart");
-            router.push(`/usage/charts/${props.id}`);
-        };
-        
+            if(readings.value.length < 2){
+                isAlertOpen.value = true;
+                errorMessage.value = t("Readings.msg-chart-error")
+                throw new Error("Not enough readings to build a chart");
+            }
+            else{
+                const modal = await modalController.create({
+                    component: BuildChart,
+                    componentProps: {
+                        currMeterId: props.id,
+                        readings: readings.value,
+                    },
+                    cssClass: 'build-chart',
+                    swipeToClose: true,
+                    enterAnimation: mdEnterAnimation,
+                    leaveAnimation: mdLeaveAnimation,
+                    mode: "md",
+                    presentingElement: document.querySelector('ion-content'),
+                    backdropDismiss: true,
+                });
+                return modal.present();
+            }
+        }
+
         // delete reading
         const deleteItem = async (readingId) => {
             const readingIds = readings.value.map(item => item.id);
             log.debug(LOG, "deleteID", { readingId, readingIds });
             if(readingId !== readingIds[0]){
                 isAlertOpen.value = true;
+                errorMessage.value = t("Readings.msg-delete-error")
                 throw new Error("Cannot delete this reading");
             }
             try {
@@ -303,7 +330,8 @@ export default {
             ready,
             loading,
             refresh,
-            deleteError: t("Readings.msg-delete-error"),
+            Error: t("Readings.title-error"),
+            errorMessage,
             isAlertOpen,
             alertButtons,
         };
@@ -326,8 +354,8 @@ export default {
         <ion-content>
             <ion-alert
                 :is-open="isAlertOpen"
-                header="Error"
-                :message="deleteError"
+                :header="Error"
+                :message="errorMessage"
                 :buttons="alertButtons"
                 css-class="error-alert"
                 @did-dismiss="isAlertOpen = false">
@@ -373,7 +401,7 @@ export default {
                     :disabled="!ready"
                     color="primary"
                     >
-                    <ion-icon :icon="menuIcon" />
+                    <ion-icon :icon="menuIcon"/>
                 </ion-fab-button>
                 <ion-fab-list side="top">
                     <ion-fab-button
@@ -381,7 +409,7 @@ export default {
                         color="primary"
                         @click="toAddReading"
                         >
-                        <ion-icon :icon="addIcon" />
+                        <ion-icon :icon="addIcon"/>
                     </ion-fab-button>
                     <ion-fab-button
                         :disabled="!ready"
@@ -426,13 +454,18 @@ export default {
     --border-radius: 10px;
 }
 .edit-comment-class{
-    --width:80%;
+    --width:90%;
     --height:35%;
     --border-radius: 10px;
 }
 .confirm-dialog-class {
     --width: 80%;
-    --height: 25%;
+    --height: 28%;
+    --border-radius: 10px;
+}
+.build-chart {
+    --width: 85%;
+    --height: 40%;
     --border-radius: 10px;
 }
 
@@ -450,7 +483,7 @@ export default {
 
 
 .error-alert .alert-button-group {
-    background-color: #ff0000; /* Red background color for buttons */
+     /* Red background color for buttons */
     display: flex; /* Display buttons in a row */
     justify-content: center; /* Center buttons */
     align-items: center; /* Center buttons */
@@ -459,7 +492,12 @@ export default {
     border-radius: 5px; /* Round corners */
 }
 
-
+.error-alert .alert-button{
+    background-color: #ff0000;
+    width: 20%; /* Make buttons take full width */
+    text-align: center; /* Center text inside the button */
+    padding: 5px 15px 5px 0;
+}
 
 .error-alert .alert-button-inner {
     color: #ffffff;         /* White text color */

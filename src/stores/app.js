@@ -10,6 +10,8 @@ export const useAppStore = defineStore(id, {
     return {
       shouldReloadData: false,
       shouldReloadUsage: false,
+      readingsArray: [],
+      dateDisplayFormat: "MMM",
       multiselect: false,
       loading: false,
       version: process.env.VUE_APP_VERSION,
@@ -17,6 +19,14 @@ export const useAppStore = defineStore(id, {
     };
   },
   actions: {
+    formatDate(format){
+      this.dateDisplayFormat = format;
+    },
+    changeReadingsArray(newVal){
+      log.debug(LOG, "[A|changeReadingsArray]");
+      this.readingsArray = newVal.slice();
+      log.debug(LOG, "[A|changeReadingsArray] readingsArray: ", this.readingsArray);
+    },
     reloadData(newVal) {
       log.debug(LOG, "[A|reloadData]");
       this.shouldReloadData = newVal;

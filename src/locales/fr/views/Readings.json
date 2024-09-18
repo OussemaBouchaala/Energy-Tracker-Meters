@@ -2,5 +2,7 @@
     "msg-delete-reading": "Vous êtes sûr de vouloir supprimer cette lecture?",
     "title-delete-reading": "Supprimer lecture",
     "edit-reading-comment": "Modifier le commentaire",
-    "msg-delete-error": "Ne peut supprimer que la dernière lecture entrée!"
+    "msg-delete-error": "Ne peut supprimer que la dernière lecture entrée!",
+    "title-error": "Erreur",
+    "msg-chart-error": "Pas assez de lectures pour afficher le graphique, veuillez en entrer plus!"
 }

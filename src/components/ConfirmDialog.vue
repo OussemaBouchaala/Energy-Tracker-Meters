@@ -8,13 +8,17 @@
             </ion-buttons>
         </ion-toolbar>
     </ion-header>
-    <ion-content>
-        <ion-text style="margin:5px;">{{ message }}</ion-text>
+    <ion-content style="padding: 3px;">
+        <ion-item>
+            <ion-text style="margin:5px;">{{ message }}</ion-text>
+        </ion-item>
         <ion-button expand="block" @click="confirm">Ok</ion-button>
     </ion-content>
   </template>
   
   <script>
+import log from "loglevel";
+
 import { 
     IonText,
     IonContent, 
@@ -23,11 +27,15 @@ import {
     IonTitle, 
     IonButtons, 
     IonButton,
-
+    IonItem,
     modalController,
 } from '@ionic/vue';
 
+const name = 'ConfirmationDialog';
+const LOG = `[view|${name}]`;
+
 export default{
+    name,
     components: {
         IonText,
         IonContent,
@@ -36,6 +44,7 @@ export default{
         IonTitle,
         IonButtons,
         IonButton,
+        IonItem,
     },
     props: {
         message: {
@@ -52,11 +61,13 @@ export default{
         },
     },
     setup(props) {
-        function dismissModal() {
+        log.debug(LOG, "setup");
+
+        const dismissModal = () => {
             modalController.dismiss();
         }
 
-        function confirm() {
+        const confirm = () => {
             modalController.dismiss({ action: props.action });
         }
 

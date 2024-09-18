@@ -1,4 +1,11 @@
 {
     "evolution-averages": "Évolution des Moyennes",
-    "evolution-values": "Évolution des Valeurs"
+    "evolution-values": "Évolution des Valeurs",
+    "year": "Année",
+    "month": "Mois",
+    "custom-chart-title": "Construire un Chart",
+    "select-category": "Seléctionner la catégorie",
+    "enter": "Entrer",
+    "valid-year": "Entrer un an valid!",
+    "valid-month": "Entrer un mois valid!"
 }

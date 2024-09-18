@@ -174,7 +174,6 @@ export default {
             document.body.classList.toggle('dark-theme',darkModeEnabled.value);
             document.body.classList.toggle('light-theme',!darkModeEnabled.value);
             try {
-                await showLoading();
                 await run(
                     update({
                         name: 'darkMode',
@@ -186,8 +185,6 @@ export default {
                 //shouldReloadData.value = true;
             } catch (ex) {
                 log.error(ex);
-            } finally {
-                await hideLoading();
             }
         }
 

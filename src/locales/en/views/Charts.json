@@ -1,4 +1,11 @@
 {
     "evolution-averages": "Evolution of Averages",
-    "evolution-values": "Evolution of Values"
+    "evolution-values": "Evolution of Values",
+    "year": "Year",
+    "month": "Month",
+    "custom-chart-title": "Build Chart",
+    "select-category": "Select category",
+    "enter": "Enter",
+    "valid-year": "Enter a valid year!",
+    "valid-month": "Enter a valid month!"
 }

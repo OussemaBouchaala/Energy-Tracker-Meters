@@ -11,7 +11,7 @@ ToDo list:
         - edit comment ----------------------------- 100% Done
         - delete reading:
             * delete action ------------------------ 100% Done
-            * delete constraint -------------------- 0%
+            * delete constraint -------------------- 100% Done
         - average :
             * add average property ----------------- 100% Done
             * fetch previous reading data if exist-- 100% Done
@@ -19,7 +19,10 @@ ToDo list:
     - add charts:
         - charts component ------------------------- 100% Done
         - build charts ----------------------------- 100% Done
-        - popup for customize build ---------------- 0%
+        - popup for customize build :
+            * choose one year or one month---------- 100% Done
+            * select a period of time -------------- 0%
+            * control no readings error ------------ 100% Done
 - settings:
     - toggle language:
         - register language property in db --------- 100% Done

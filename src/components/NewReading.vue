@@ -74,7 +74,7 @@ const name="NewReading";
 const { withMessage } = helpers;
 const LOG = `[component|${name}]`;
 
-// a and b are javascript Date objects
+// date difference function
 function dateDiffInDays(a, b) {
   a= new Date(a);
   b= new Date(b);
@@ -133,6 +133,8 @@ export default({
     const comment = ref('');
     const average = ref(0.0);
     const submitted = ref(false);
+    const increaseDates = ref(false);
+    const increaseValues = ref(false);
 
     const dateInput = () => {
       log.debug("dateInput");
@@ -149,7 +151,7 @@ export default({
       if(props.previousReading){
         const previousReadingDate = new Date(props.previousReading.date);
         const selectedDate = new Date(dat);
-        return selectedDate >= previousReadingDate;
+        return selectedDate > previousReadingDate;
       }
       return true
     };
@@ -157,9 +159,6 @@ export default({
     const rules = {
       value: {
         required: withMessage(t("AddReading.msg-value-required"), required),
-        minValue: withMessage(
-          t("AddReading.msg-value-min"),
-          minValue(props.previousReading? props.previousReading.value: props.currMeterInitVal? props.currMeterInitVal: 0)),
       },
       date: {
         required: withMessage(t("AddReading.msg-date-required"), required),
@@ -167,12 +166,19 @@ export default({
         //   t("AddReading.msg-date-min"),
         //   minValue(new Date(props.previousReading? props.previousReading.date: null))
         // ),
-        minValue: withMessage(
-          t("AddReading.msg-date-min"),
-          isNotValid
-        ),
       },
     };
+    if(increaseValues.value){
+      rules.value.minValue= withMessage(
+        t("AddReading.msg-value-min"),
+        minValue(props.previousReading? props.previousReading.value: props.currMeterInitVal? props.currMeterInitVal: 0)
+      )
+    }
+    if(increaseDates.value){
+      rules.date.minValue= withMessage(
+        t("AddReading.msg-date-min"),
+        isNotValid      )
+    }
     const v$ = useVuelidate(rules, { value, date }, { $autoDirty: true });
 
     const save = async () => {
@@ -205,12 +211,19 @@ export default({
         const b = props.previousReading.date;
         
         const result = dateDiffInDays(b, a);
+        
         log.debug(LOG,"days between dates", a);
         log.debug(LOG,"value utc1", b);
-        average.value = ((
+        if(a === b){
+          average.value = 0;
+        }
+        else{
+          average.value = ((
           value.value - props.previousReading.value) / 
             result).toFixed(3);
+        }
         log.debug(LOG,"calculatedAverage", average.value);
+        
       }
       
       //add to db   

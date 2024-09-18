@@ -31,9 +31,8 @@ import {
     IonToolbar
 } from '@ionic/vue';
 import 'chartjs-adapter-moment';
-import { ref, onMounted } from "vue";
-import repo from "../db/repo/readings";
-import repo1 from "../db/repo/meters";
+import { ref, onMounted} from "vue";
+import repo from "../db/repo/meters";
 import { Retrier } from "@jsier/retrier";
 import useSQLite from "../composables/useSQLite";
 import { useI18n } from "vue-i18n";
@@ -42,7 +41,7 @@ import { storeToRefs } from "pinia";
 import { useAppStore } from "../stores/app";
 //import { forEach } from "core-js/core/array";
 
-const { getById } = repo1;
+const { getById } = repo;
 const name = 'Charts';
 const LOG = `[view|${name}]`;
 
@@ -71,41 +70,46 @@ export default{
 
         useI18n();
         const store = useAppStore();
-        
-        const { ready, query, querySingle } = useSQLite();
-        
-        const readings = ref([]);
+        const { showLoading, hideLoading} = store;
+        const { ready, querySingle } = useSQLite();
+        const { shouldReloadData, readingsArray, dateDisplayFormat } = storeToRefs(store);
         const meterName = ref("");
-        let dataReadings = null;
         let currentMeter = null;
         const averages =  ref([]);
         const dates = ref([]);
         const values = ref([]);
-
-        const { shouldReloadData } = storeToRefs(store);
-        const { showLoading, hideLoading } = store;
+        const unit = dateDisplayFormat.value === "MMM" ? "month" : "day";
 
         const retrierOptions = {
-        limit: 5,
-        firstAttemptDelay: 0,
-        delay: 250,
-        keepRetryingIf: (response, attempt) => {
-            log.debug(LOG, "keepRetryingIf", {
-                response,
-                attempt,
-            });
-            return !ready.value;
-        },
+            limit: 5,
+            firstAttemptDelay: 0,
+            delay: 250,
+            keepRetryingIf: (response, attempt) => {
+                log.debug(LOG, "keepRetryingIf", {
+                    response,
+                    attempt,
+                });
+                return !ready.value;
+            },
         };
         const retrier = new Retrier(retrierOptions);
 
+        log.debug(LOG, "Loaded readings", { readings: readingsArray.value });
+        
         showLoading();
         onMounted(() => {
-            tryLoadAndCreateChart();
+            readingsArray.value.forEach(reading => {
+                averages.value.push(reading.average);
+                dates.value.push(reading.date);
+                values.value.push(reading.value);
+            });
+            log.debug(LOG, "Loaded data", {averages: averages.value, dates: dates.value, values: values.value});
+            tryCreateChart();
+            readingsArray.value = [];
         });
         let chart;
         // Create a new chart instance
-        const createChart = (ctx,labels,datasetLabel,data,minDate,destroy=false) => {
+        const createChart = (ctx,labels,datasetLabel,data,minDate,displayFormat,unit,destroy=false) => {
             if (destroy && chart) {
                 chart.destroy();
             }
@@ -141,10 +145,10 @@ export default{
                         x: {
                             type: 'time',
                             time: {
-                                unit: 'month',
+                                unit: unit,
                                 tooltipFormat: 'DD MMM YYYY',
                                 displayFormats: {
-                                    month: 'MMM'
+                                    month: displayFormat
                                 }
                             },
                             min: minDate,
@@ -163,7 +167,7 @@ export default{
             return chart;
         }
         
-        const tryLoadAndCreateChart = () => {
+        const tryCreateChart = () => {
             shouldReloadData.value = false;
             retrier
                 .resolve((attempt) => loadData(attempt))
@@ -180,7 +184,9 @@ export default{
                 .then(() => {
                     const month = new Date(dates.value[0]).getMonth()
                     const year = new Date(dates.value[0]).getFullYear();
-                    const firstDate = new Date(year, month, 1);
+                    const firstDate = dateDisplayFormat==="MMM"? 
+                        new Date(year, month, 1)
+                        :new Date(year, month, new Date(dates.value[0]).getDate());
                     log.debug(LOG, "First date", firstDate);
                     createChart(
                         document.getElementById('averages').getContext('2d'),
@@ -188,6 +194,8 @@ export default{
                         t('Charts.evolution-averages'),
                         averages.value,
                         firstDate,
+                        dateDisplayFormat.value,
+                        unit,
                         true
                     );
                     log.debug(LOG, "Chart1 created");
@@ -196,7 +204,9 @@ export default{
                         dates.value,
                         t('Charts.evolution-values'),
                         values.value,
-                        firstDate
+                        firstDate,
+                        dateDisplayFormat.value,
+                        unit
                     );
                     log.debug(LOG, "Chart2 created");
                 });
@@ -209,24 +219,8 @@ export default{
             }
             try {
                 currentMeter = await querySingle(getById({ id: parseInt(props.id) }));
-                dataReadings = await query(repo.getAll({ meter_id: parseInt(props.id) }));
-                log.debug(LOG, "Loaded readings data",  dataReadings );
-                readings.value = dataReadings
-                
-                readings.value.forEach(reading => {
-                    averages.value.push(reading.average);
-                    dates.value.push(reading.date);
-                    values.value.push(reading.value);
-                });
-                log.debug(LOG, "Loaded data", {averages: averages.value, dates: dates.value, values: values.value});
-                // forEach(readings.value, (reading, i) => {
-                //     //const reading = readings.value[i];
-                //     const average = reading.values.reduce((sum, value) => sum + value, 0) / reading.values.length;
-                //     averages.push(average);
-                // })
                 meterName.value = currentMeter.name
                 log.debug(LOG, "Loaded name:", meterName.value );
-                log.debug(LOG, "Loaded readings", { readings: readings.value });
             } catch (err) {
                 log.error(LOG, "Error loading data", err);
                 throw err;
