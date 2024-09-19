@@ -1,6 +1,6 @@
 {
 	"appId": "io.ionic.starter",
 	"appName": "energy-tracker",
-	"webDir": "dist",
+	"webDir": "public",
 	"bundledWebRuntime": false
 }
